@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePostRequest;
 use App\Http\Resources\PostResource;
 use App\Models\Post;
-use Illuminate\Http\Request;
 
 class PostController extends Controller
 {
@@ -28,7 +27,7 @@ class PostController extends Controller
 
         $post = Post::create($data);
 
-        return response()->json($post, 201);
+        return response()->json(new PostResource($post), 201);
     }
 
     /**
@@ -38,7 +37,7 @@ class PostController extends Controller
     {
         //route model binding
         // converting to json instead of relying on laravel
-        return response()->json($post, 201);
+        return response()->json(new PostResource($post), 201);
     }
 
     /**
@@ -48,7 +47,7 @@ class PostController extends Controller
     {
         $data = $request->validated();
         $post->update($data);
-        return response()->json($post, 201);
+        return response()->json(new PostResource($post), 201);
     }
 
     /**
@@ -57,6 +56,6 @@ class PostController extends Controller
     public function destroy(Post $post)
     {
         $post->delete();
-        return response()->noContent();
+        return response()->json(new PostResource($post), 201);
     }
 }
