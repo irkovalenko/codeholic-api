@@ -25,11 +25,11 @@ Route::post('/reset-password', [NewPasswordController::class, 'store'])
     ->name('password.store');
 
 Route::get('/verify-email/{id}/{hash}', VerifyEmailController::class)
-    ->middleware(['auth:sanctum', 'signed', 'throttle:6,1']) // 6 request per 1 minute
+    ->middleware(['auth:sanctum', 'signed', 'throttle:10,1']) // 10 request per 1 minute
     ->name('verification.verify');
 
 Route::post('/email/verification-notification', [EmailVerificationNotificationController::class, 'store'])
-    ->middleware(['auth:sanctum', 'throttle:6,1'])
+    ->middleware(['auth:sanctum', 'throttle:10,1'])
     ->name('verification.send');
 
 Route::post('/logout', [LoginController::class, 'destroy'])
