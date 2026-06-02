@@ -6,56 +6,59 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePostRequest;
 use App\Http\Resources\PostResource;
 use App\Models\Post;
+use Illuminate\Support\Facades\Auth;
 
 class PostController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        return PostResource::collection(Post::with('user')->latest()->get());
+        $user = request()->user();
+        $posts = $user->posts()->latest()->paginate();
+        return PostResource::collection($posts);
+        //simple ::all() will return post with no user info
     }
 
-    /*
-     * Store a newly created resource in storage.
-     */
     public function store(StorePostRequest $request)
     {
         $data = $request->validated();
-        $data['user_id'] = 1;
+        $data['user_id'] = $request->user()->id;
 
         $post = Post::create($data);
 
-        return response()->json(new PostResource($post), 201);
+        return new PostResource($post);
     }
 
-    /**
-     * Display the specified resource.
-     */
+
     public function show(Post $post)
     {
-        //route model binding
+
+        if (Auth::id() !== $post->user_id) {
+            abort(403, 'Unauthorized');
+        }
+
+        //route model binding - laravel get the model by id in url
         // converting to json instead of relying on laravel
-        return response()->json(new PostResource($post), 201);
+        return new PostResource($post);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+
     public function update(StorePostRequest $request, Post $post)
     {
+        if (Auth::id() !== $post->user_id) {
+            abort(403, 'Unauthorized');
+        }
         $data = $request->validated();
         $post->update($data);
-        return response()->json(new PostResource($post), 201);
+        return new PostResource($post);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+
     public function destroy(Post $post)
     {
+        if (Auth::id() !== $post->user_id) {
+            abort(403, 'Unauthorized');
+        }
         $post->delete();
-        return response()->json(new PostResource($post), 201);
+        return new PostResource($post);
     }
 }

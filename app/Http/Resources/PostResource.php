@@ -7,6 +7,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class PostResource extends JsonResource
 {
+    public static $wrap = null; // to remove data wrapper in response
     /**
      * Transform the resource into an array.
      *
@@ -18,7 +19,7 @@ class PostResource extends JsonResource
             'id' => $this->id,
             'title' => $this->title,
             'body' => $this->body,
-            'user' => new UserResource($this->user),
+            'user' => new UserResource($this->whenLoaded('user')),
             'created_at' => $this->created_at->toDateTimeString(),
         ];
     }
